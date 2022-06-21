@@ -22,7 +22,7 @@ logger.addHandler(ch)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tf-pose-estimation run')
     parser.add_argument('--image', type=str, default='./images/p1.jpg')
-    parser.add_argument('--model', type=str, default='cmu',
+    parser.add_argument('--model', type=str, default='mobilenet_thin',
                         help='cmu / mobilenet_thin / mobilenet_v2_large / mobilenet_v2_small')
     parser.add_argument('--resize', type=str, default='0x0',
                         help='if provided, resize images before they are processed. '
@@ -46,6 +46,15 @@ if __name__ == '__main__':
 
     t = time.time()
     humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)
+    first = humans[0].body_parts
+    frame_landmarks = []
+    for k, v in first.items():
+        x, y = v.x, v.y
+        frame_landmarks.append(x)
+        frame_landmarks.append(y)
+
+    # keypoints = str(humans[0]).split('BodyPart:')[1:].split('-').split(' score=')
+
     elapsed = time.time() - t
 
     logger.info('inference image: %s in %.4f seconds.' % (args.image, elapsed))
