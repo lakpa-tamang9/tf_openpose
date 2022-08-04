@@ -1,6 +1,7 @@
 import argparse
 import logging
 import time
+import csv
 
 import cv2
 import numpy as np
@@ -9,22 +10,17 @@ from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 import psutil
 
-
-
-# # logger = logging.getLogger('TfPoseEstimator-Video')
-# logger.setLevel(logging.DEBUG)
-# ch = logging.StreamHandler()
-# ch.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
-# ch.setFormatter(formatter)
-# logger.addHandler(ch)
+# If pafprocess error, build it from source as follows
+# $ cd core/tf_pose/pafprocess/
+# $ swig -python -c++ pafprocess.i 
+# $ python setup.py build_ext --inplace
 
 fps_time = 0
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tf-pose-estimation Video')
-    parser.add_argument('--video', type=str, default='sample2.mp4')
+    parser.add_argument('--video', type=str, default='bigwind.mov')
     parser.add_argument('--resolution', type=str, default='432x368', help='network input resolution. default=432x368')
     parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin / mobilenet_v2_large / mobilenet_v2_small')
     parser.add_argument('--show-process', type=bool, default=False,
@@ -43,8 +39,9 @@ if __name__ == '__main__':
     video_landmarks = []
     while cap.isOpened():
         ret_val, image = cap.read()
-
-        humans = e.inference(image)
+        if not ret_val:
+            continue
+        humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size = 4.0)
         if len(humans) > 0:
             bodyParts = humans[0].body_parts
             frame_landmarks = []
@@ -57,6 +54,12 @@ if __name__ == '__main__':
             image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
 
             video_landmarks.append(frame_landmarks)
+
+            with open("landmarks.csv", "w") as file:
+                csvwriter = csv.writer(file)
+                csvwriter.writerows(video_landmarks)
+
+            # print(video_landmarks)
         cv2.putText(image, "FPS: %f" % (1.0 / (time.time() - fps_time)), (10, 10),  cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         cv2.resize(image, (1920, 1080))
         cv2.imshow('tf-pose-estimation result', image)
