@@ -534,7 +534,8 @@ class TfPoseEstimator:
 
     def inference(self, npimg, resize_to_default=True, upsample_size=1.0):
         if npimg is None:
-            raise Exception('The image is not valid. Please check your image exists.')
+            pass
+            # raise Exception('The image is not valid. Please check your image exists.')
 
         if resize_to_default:
             upsample_size = [int(self.target_size[1] / 8 * upsample_size), int(self.target_size[0] / 8 * upsample_size)]
@@ -545,7 +546,6 @@ class TfPoseEstimator:
             # quantize input image
             npimg = TfPoseEstimator._quantize_img(npimg)
             pass
-
         logger.debug('inference+ original shape=%dx%d' % (npimg.shape[1], npimg.shape[0]))
         img = npimg
         if resize_to_default:
