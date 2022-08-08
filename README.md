@@ -24,3 +24,4 @@ cd core/tf_pose/pafprocess/
 swig -python -c++ pafprocess.i 
 python setup.py build_ext --inplace
 ```
+5. Run inference in webcam using ```run_webcam.py``` and for pre-recorded video using ```run_video.py```
