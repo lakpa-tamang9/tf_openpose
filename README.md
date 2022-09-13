@@ -2,14 +2,14 @@
 Original work: https://www.github.com/ildoonet/tf-openpose
 
 ## Usage
-1. Create new environment
+1. Create new environment and activate it
 ```
 conda create -n tfpose python=3.7.6 -y
+conda activate tfpose
 ```
 2. Install conda packages:
 ```
 conda install -c anaconda numpy
-conda install -c conda-forge opencv
 conda instal swig
 ```
 
@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 4. Build from source using swig
 ```
-cd core/tf_pose/pafprocess/
+cd tf_pose/pafprocess/
 swig -python -c++ pafprocess.i 
 python setup.py build_ext --inplace
 ```
